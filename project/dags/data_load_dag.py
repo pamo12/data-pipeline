@@ -12,8 +12,8 @@ from helpers import SqlQueries
 default_args = {
     'owner': 'udacity',
     'start_date': datetime.now(),
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=1),
     'email_on_retry': False
 }
 
@@ -28,12 +28,24 @@ start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
-    dag=dag
+    dag=dag,
+    target_table="staging_events",
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    s3_bucket="udacity-dend",
+    s3_key="log_data/2018/11/2018-11-01-events.json",
+    json_path="s3://udacity-dend/log_json_path.json"
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
-    dag=dag
+    dag=dag,
+    target_table="staging_songs",
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    s3_bucket="udacity-dend",
+    s3_key="song-data/A/A/A/TRAAAAV128F421A322.json",
+    json_path="auto"
 )
 
 load_songplays_table = LoadFactOperator(
@@ -43,22 +55,38 @@ load_songplays_table = LoadFactOperator(
 
 load_user_dimension_table = LoadDimensionOperator(
     task_id='Load_user_dim_table',
-    dag=dag
+    dag=dag,
+    target_table="users",
+    source_db="public",
+    select_sql=SqlQueries.user_table_insert,
+    redshift_conn_id="redshift"
 )
 
 load_song_dimension_table = LoadDimensionOperator(
     task_id='Load_song_dim_table',
-    dag=dag
+    dag=dag,
+    target_table="songs",
+    source_db="public",
+    select_sql=SqlQueries.song_table_insert,
+    redshift_conn_id="redshift"
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
     task_id='Load_artist_dim_table',
-    dag=dag
+    dag=dag,
+    target_table="artists",
+    source_db="public",
+    select_sql=SqlQueries.artist_table_insert,
+    redshift_conn_id="redshift"
 )
 
 load_time_dimension_table = LoadDimensionOperator(
     task_id='Load_time_dim_table',
-    dag=dag
+    dag=dag,
+    target_table="time",
+    source_db="public",
+    select_sql=SqlQueries.time_table_insert,
+    redshift_conn_id="redshift"
 )
 
 run_quality_checks = DataQualityOperator(

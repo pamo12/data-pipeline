@@ -9,8 +9,8 @@ import sql_statements
 default_args = {
     'owner': 'udacity',
     'start_date': datetime.now(),
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=1),
     'email_on_retry': False
 }
 
