@@ -1,8 +1,3 @@
-#Instructions
-#1 - Set an SLA on our bikeshare traffic calculation operator
-#2 - Add data verification step after the load step from s3 to redshift
-#3 - Add data verification step after we calculate our output table
-
 import datetime
 import logging
 
@@ -111,9 +106,4 @@ create_trips_table >> copy_trips_task
 create_stations_table >> copy_stations_task
 copy_trips_task >> check_trips
 copy_stations_task >> check_stations
-
-#
-# TODO: Set the task dependencies for the stations and trips check tasks
-#
-
 
